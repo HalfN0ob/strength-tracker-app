@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Strength &amp; Hypertrophy Tracker</title>
+  <meta name="theme-color" content="#0f141c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Strength Tracker" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="dumbbell.png" />
+  <link rel="apple-touch-icon" href="dumbbell.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header & Upgraded Rest Timer -->
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <img src="dumbbell.png" alt="Logo" class="brand-icon" />
+          <div>
+            <h1>Strength &amp; Hypertrophy Tracker</h1>
+            <p class="subtitle" id="activePlanHeader">Active Plan: Default Upper/Lower</p>
+          </div>
+        </div>
+
+        <nav class="nav-tabs" aria-label="Main navigation">
+          <button class="nav-tab active" data-tab="today">Today</button>
+          <button class="nav-tab" data-tab="builder">Plan Builder</button>
+          <button class="nav-tab" data-tab="history">History</button>
+        </nav>
+      </div>
+
+      <div class="timer-widget" id="timerWidget">
+        <div class="timer-top">
+          <div class="timer-info">
+            <span class="timer-label" id="timerLabel">Rest Timer</span>
+            <span class="timer-display" id="timerDisplay">02:45</span>
+          </div>
+          <div class="timer-controls">
+            <button class="btn-icon" id="timerMinusBtn" title="-15s">-15s</button>
+            <button class="btn-primary btn-sm" id="timerToggleBtn">Start</button>
+            <button class="btn-icon" id="timerPlusBtn" title="+15s">+15s</button>
+            <button class="btn-icon" id="timerResetBtn" title="Reset">↺</button>
+            <button class="btn-icon" id="timerMuteBtn" title="Mute / Unmute">🔊</button>
+          </div>
+        </div>
+        <div class="timer-progress-track">
+          <div class="timer-progress-fill" id="timerProgressFill"></div>
+        </div>
+        <div class="timer-presets">
+          <button class="preset-chip" data-sec="60">1:00</button>
+          <button class="preset-chip" data-sec="90">1:30</button>
+          <button class="preset-chip" data-sec="105">1:45</button>
+          <button class="preset-chip" data-sec="120">2:00</button>
+          <button class="preset-chip" data-sec="165">2:45</button>
+          <button class="preset-chip" data-sec="180">3:00</button>
+          <div class="custom-timer-wrap">
+            <input type="number" id="timerCustomSec" min="10" max="900" step="5" placeholder="sec" inputmode="numeric" />
+            <button class="preset-chip" id="timerSetCustomBtn">Set</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- TAB 1: TODAY'S WORKOUT -->
+    <main class="tab-panel active" id="tab-today">
+      <div class="cycle-bar card">
+        <div class="cycle-steps" id="cycleSteps"></div>
+        <div class="cycle-actions">
+          <span class="date-pill" id="todayDateLabel"></span>
+        </div>
+      </div>
+
+      <div class="workout-grid">
+        <!-- Left Column: Exercises / Rest Day -->
+        <section class="workout-main" id="workoutMain"></section>
+
+        <!-- Right Sidebar: Daily Check-In, Nutrition & Meals -->
+        <aside class="workout-sidebar">
+          <div class="card sidebar-card">
+            <h2>Daily Check-In &amp; Nutrition</h2>
+
+            <div class="form-row three-col">
+              <div class="field">
+                <label for="inputBodyweight">Weight (kg)</label>
+                <input type="number" id="inputBodyweight" step="0.1" min="35" max="200" placeholder="71.0" inputmode="decimal" />
+              </div>
+              <div class="field">
+                <label for="inputBodyFat">Body Fat %</label>
+                <input type="number" id="inputBodyFat" step="0.1" min="5" max="45" placeholder="14.5" inputmode="decimal" />
+              </div>
+              <div class="field">
+                <label for="inputSleep">Sleep (hrs)</label>
+                <input type="number" id="inputSleep" step="0.5" min="0" max="14" placeholder="8.0" inputmode="decimal" />
+              </div>
+            </div>
+
+            <div class="goal-weight-row">
+              <div class="field goal-w-field">
+                <label for="inputGoalWeight">Goal Weight (kg)</label>
+                <input type="number" id="inputGoalWeight" step="0.1" min="35" max="200" placeholder="78.0" inputmode="decimal" />
+              </div>
+              <div class="goal-est-box" id="goalEstimateBox"></div>
+            </div>
+
+            <div class="check-row">
+              <label class="checkbox-pill">
+                <input type="checkbox" id="inputProteinHit" />
+                <span id="proteinTargetLabel">Hit 134–152g Protein</span>
+              </label>
+            </div>
+
+            <div class="section-mini-label">Activity Level (affects TDEE &amp; ETA)</div>
+            <div class="pill-grid four-col" id="activityBtnGroup">
+              <button type="button" class="pill-btn" data-act="sedentary" title="Desk job, no structured exercise (1.2x BMR)">Sedentary</button>
+              <button type="button" class="pill-btn" data-act="light" title="Light exercise 1-3x/wk (1.375x BMR)">Light</button>
+              <button type="button" class="pill-btn" data-act="moderate" title="Lifting 3-5x/wk (1.55x BMR)">Moderate</button>
+              <button type="button" class="pill-btn" data-act="very" title="Hard training 6-7x/wk (1.725x BMR)">Very Active</button>
+            </div>
+
+            <div class="section-mini-label">Calorie Goal (saved across days)</div>
+            <div class="pill-grid four-col" id="goalBtnGroup">
+              <button type="button" class="pill-btn" data-goal="cut">Cut</button>
+              <button type="button" class="pill-btn" data-goal="maintain">Maintain</button>
+              <button type="button" class="pill-btn" data-goal="bulk">Bulk</button>
+              <button type="button" class="pill-btn" data-goal="custom">Custom</button>
+            </div>
+
+            <div class="custom-cal-row hidden" id="customCalRow">
+              <label for="inputCustomCals">Custom Daily kcal:</label>
+              <input type="number" id="inputCustomCals" min="800" max="10000" step="50" placeholder="2700" inputmode="numeric" />
+            </div>
+
+            <div class="calorie-badge" id="calorieTargetBadge">Lean Bulk: 2850-2950 kcal / day</div>
+
+            <div class="divider"></div>
+
+            <h3>Daily Meals &amp; Macros</h3>
+            <div class="macro-progress-block">
+              <div class="macro-summary-row">
+                <span id="calSummaryText">0 / 2900 kcal</span>
+                <span id="protSummaryText">0 / 143g protein</span>
+              </div>
+              <div class="progress-bar-track"><div class="progress-bar-fill cal-fill" id="calProgressFill"></div></div>
+              <div class="progress-bar-track"><div class="progress-bar-fill prot-fill" id="protProgressFill"></div></div>
+            </div>
+
+            <div class="meal-inputs">
+              <input type="text" id="inputMealName" placeholder="Meal name (e.g. Chicken & Rice)" />
+              <div class="meal-num-row">
+                <input type="number" id="inputMealCals" placeholder="kcal" min="0" inputmode="numeric" />
+                <input type="number" id="inputMealProtein" placeholder="Protein (g)" min="0" inputmode="numeric" />
+                <button type="button" class="btn-primary btn-sm" id="addMealBtn">+ Add</button>
+                <button type="button" class="btn-secondary btn-sm" id="savePresetMealBtn" title="Save as quick-add meal">★ Save</button>
+              </div>
+            </div>
+
+            <div class="saved-meals-wrap" id="savedMealsPanel"></div>
+            <div class="meals-list" id="mealsListPanel"></div>
+
+            <div class="divider"></div>
+
+            <div class="field">
+              <label for="inputSessionNotes">Session Notes</label>
+              <textarea id="inputSessionNotes" rows="2" placeholder="Energy, form cues, PR notes..."></textarea>
+            </div>
+
+            <div class="sidebar-actions">
+              <button class="btn-primary btn-full" id="saveSessionBtn">Save Session &amp; Advance Day</button>
+            </div>
+            <p class="status-msg" id="saveStatusMsg"></p>
+          </div>
+
+          <div class="card sidebar-card quick-stats-card">
+            <h3>Top Lift PRs &amp; Quick Stats</h3>
+            <div class="stat-list" id="quickStatsList"></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- TAB 2: PLAN BUILDER -->
+    <main class="tab-panel" id="tab-builder">
+      <div class="builder-grid">
+        <!-- Column 1: Plans & Days -->
+        <div class="builder-col">
+          <div class="card">
+            <h2>Saved Workout Plans</h2>
+            <div id="builderPlansPanel" class="builder-list"></div>
+            <div class="builder-add-row">
+              <input type="text" id="inputNewPlanName" placeholder="New plan name (e.g. PPL)" />
+              <button class="btn-primary btn-full" id="createPlanBtn">+ Create New Plan</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Days in Selected Plan</h2>
+            <div id="builderDaysPanel" class="builder-list"></div>
+            <div class="builder-add-row">
+              <input type="text" id="inputNewDayName" placeholder="Day name (e.g. Push Day)" />
+              <div class="two-btn-row">
+                <button class="btn-primary btn-sm" id="addWorkDayBtn">+ Workout Day</button>
+                <button class="btn-secondary btn-sm" id="addRestDayBtn">+ Rest Day</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Exercises in Selected Day -->
+        <div class="builder-col">
+          <div class="card">
+            <div class="card-header">
+              <h2>Exercises in Selected Day</h2>
+              <button class="btn-primary btn-sm" id="saveActivatePlanBtn">Save &amp; Use Plan</button>
+            </div>
+            <p class="status-msg" id="builderStatusMsg"></p>
+            <div id="builderDayExercisesPanel" class="builder-ex-list"></div>
+          </div>
+        </div>
+
+        <!-- Column 3: Exercise Library (160+ exercises) -->
+        <div class="builder-col">
+          <div class="card">
+            <h2>Exercise Library</h2>
+            <input type="search" id="librarySearchInput" class="library-search" placeholder="Search exercises (e.g. squat, curl, cable)..." />
+            <div id="muscleGroupPills" class="muscle-pills"></div>
+            <div id="libraryExercisesPanel" class="library-list"></div>
+
+            <div class="divider"></div>
+            <h3>Add Custom Exercise</h3>
+            <div class="custom-ex-form">
+              <input type="text" id="inputCustomExName" placeholder="Exercise name" />
+              <div class="form-row three-col">
+                <div class="field"><label>Sets</label><input type="number" id="inputCustomSets" value="3" min="1" max="10" inputmode="numeric" /></div>
+                <div class="field"><label>Min Reps</label><input type="number" id="inputCustomMinReps" value="8" min="1" max="50" inputmode="numeric" /></div>
+                <div class="field"><label>Max Reps</label><input type="number" id="inputCustomMaxReps" value="12" min="1" max="50" inputmode="numeric" /></div>
+              </div>
+              <button class="btn-secondary btn-full" id="addCustomExBtn">+ Add Custom Exercise</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 3: HISTORY & BACKUP -->
+    <main class="tab-panel" id="tab-history">
+      <div class="card history-toolbar">
+        <div>
+          <h2>Workout History &amp; Backup</h2>
+          <p class="helper-text">Saved locally on your device. Export JSON anytime to back up or transfer between phone &amp; PC.</p>
+        </div>
+        <div class="toolbar-buttons">
+          <button class="btn-secondary btn-sm" id="copyMarkdownBtn">Copy Markdown</button>
+          <button class="btn-secondary btn-sm" id="exportJsonBtn">Export JSON</button>
+          <label class="btn-secondary btn-sm file-btn">
+            Import JSON
+            <input type="file" id="importJsonInput" accept=".json" hidden />
+          </label>
+        </div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </main>
+  </div>
+
+  <!-- Rename Modal -->
+  <div class="modal-backdrop hidden" id="renameModal">
+    <div class="modal-card">
+      <h3 id="renameModalTitle">Rename</h3>
+      <input type="text" id="renameModalInput" />
+      <div class="modal-actions">
+        <button class="btn-secondary btn-sm" id="renameModalCancel">Cancel</button>
+        <button class="btn-primary btn-sm" id="renameModalSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

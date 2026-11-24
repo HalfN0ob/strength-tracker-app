@@ -1,0 +1,19 @@
+{
+  "name": "Strength & Hypertrophy Tracker",
+  "short_name": "Strength Tracker",
+  "description": "Strength & hypertrophy workout, plan builder, and nutrition tracker.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f141c",
+  "theme_color": "#0f141c",
+  "icons": [
+    {
+      "src": "dumbbell.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
